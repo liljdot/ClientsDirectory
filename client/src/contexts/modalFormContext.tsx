@@ -1,9 +1,11 @@
 import { createContext, Dispatch, ReactNode, useReducer } from "react";
 import modalFormReducer, { ModalFormReducerActions } from "../reducers/modalFormReducer";
+import { Client } from "../types";
 
 export interface ModalFormState {
     isOpen: boolean
     mode: "add" | "edit"
+    data?: Client
 }
 
 export const modalFormInitialState: ModalFormState = {
