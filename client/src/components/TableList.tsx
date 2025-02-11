@@ -1,3 +1,4 @@
+import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
 
 const TableList: React.FC = () => {
@@ -6,6 +7,8 @@ const TableList: React.FC = () => {
         { name: "Jane Doe", email: "jane.doe@gmail.com", job: "Developer", isActive: true, rate: "101", id: "2" },
         { name: "Naomi Jack", email: "naomi.jack@gmail.com", job: "Developer", isActive: false, rate: "102", id: "3" }
     ]
+
+    const {modalFormDispatch} = useModalFormContext()
 
     return (
         <div className="overflow-x-auto mt-10">
@@ -30,7 +33,7 @@ const TableList: React.FC = () => {
                             <td>{client.job}</td>
                             <td>{client.rate}</td>
                             <td><button className={`btn rounded-full w-20 ${client.isActive ? "btn-success" : "btn-outline btn-primary"}`}>{client.isActive ? "Active" : "Inactive"}</button></td>
-                            <td><button className="btn-warning btn rounded-full">Update</button></td>
+                            <td><button className="btn-warning btn rounded-full" onClick={() => {modalFormDispatch({type: "OPEN_MODAL", payload: {mode: "edit", data: client}})}}>Update</button></td>
                             <td><button className="btn-error btn rounded-full">Delete</button></td>
                         </tr>
                     ))}

@@ -2,15 +2,14 @@ import Navbar from './components/Navbar';
 import './App.css'
 import TableList from './components/TableList';
 import ModalForm from './components/ModalForm';
-import { useState } from 'react';
+import useModalFormContext from './hooks/useModalFormContext';
 
 function App() {
-  const [modalFormIsOpen, setModalFormIsOpen] = useState<boolean>(false)
-  const [modalFormMode, setModalFormMode] = useState<"add" | "edit">("add")
+  const {modalFormState} = useModalFormContext()
 
   return (
     <>
-      <ModalForm isOpen={modalFormIsOpen} toggleIsOpen={() => setModalFormIsOpen(prev => !prev)}/>
+      {modalFormState.isOpen &&<ModalForm />}
       <Navbar />
       <TableList />
     </>

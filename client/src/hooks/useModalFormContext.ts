@@ -1,6 +1,6 @@
 import { Dispatch, useContext } from "react"
-import { modalFormContext, ModalFormState } from "../contexts/modalFormCOntext"
 import { ModalFormReducerActions } from "../reducers/modalFormReducer"
+import { modalFormContext, ModalFormState } from "../contexts/modalFormContext"
 
 const useModalFormContext = (): {modalFormState: ModalFormState, modalFormDispatch: Dispatch<ModalFormReducerActions>} => {
     const context = useContext(modalFormContext)

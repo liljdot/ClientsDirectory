@@ -5,12 +5,13 @@ import { Client } from "../types";
 export interface ModalFormState {
     isOpen: boolean
     mode: "add" | "edit"
-    data?: Client
+    data: Client | null
 }
 
 export const modalFormInitialState: ModalFormState = {
     isOpen: false,
-    mode: "add"
+    mode: "add",
+    data: null
 }
 
 export const modalFormContext = createContext<{modalFormState: ModalFormState, modalFormDispatch: Dispatch<ModalFormReducerActions>} | undefined>(undefined)
