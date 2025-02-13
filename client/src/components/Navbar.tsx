@@ -7,7 +7,7 @@ const Navbar: React.FC<Props> = () => {
     const { modalFormDispatch } = useModalFormContext()
 
     return (
-        <div className="navbar bg-base-100 shadow-sm">
+        <div className="navbar bg-base-100 shadow-sm p-4">
             <div className="navbar-start">
                 <a className="btn btn-ghost text-xl">Clients</a>
             </div>
