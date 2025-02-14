@@ -1,13 +1,17 @@
-import express, { Response } from "express"
-import { AppRequest } from "./types/express"
+import express from "express"
+import cors from "cors"
 
 const app = express()
 
-app.get('/', (req: AppRequest, res) => {
-    // res.send("Hello, it works!")
-    req.data = "infi"
+const port: number = 3000
+
+app.use(cors())
+app.use(express.json())
+
+app.get('/', (req, res) => {
+    res.send("Hello, it works!")
 })
 
-app.listen(3000, () => {
-    console.log("Server is Listening..")
+app.listen(port, () => {
+    console.log("Server is listening on port " + port)
 })
