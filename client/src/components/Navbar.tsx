@@ -1,9 +1,7 @@
 import useModalFormContext from "../hooks/useModalFormContext";
 
-interface Props {
-}
 
-const Navbar: React.FC<Props> = () => {
+const Navbar: React.FC = () => {
     const { modalFormDispatch } = useModalFormContext()
 
     return (
