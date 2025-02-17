@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "dev": "npx ts-node-dev --respawn --transpile-only src/index.ts",
     "build": "tsc",
     "serve": "node dist/index.js",
     "watch": "tsc --watch"
@@ -23,6 +23,7 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.13.1",
+    "@types/pg": "^8.11.11",
     "ts-node": "^10.9.2"
   }
 }
