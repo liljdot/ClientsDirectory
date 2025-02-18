@@ -16,6 +16,24 @@ const getClients = (req: Request, res: AppResponse) => {
         .catch(e => res.status(e.status).json({ status: e.status, message: e.message, error: e.error }))
 }
 
+const searchClientByName = (req: Request, res: AppResponse) => {
+    const searchParams = req.query.q
+    if (!searchParams) {
+        return res.status(400).json({ status: 400, message: "No search input", error: "No search input" })
+    }
+
+    clientServices.searchClientByName(searchParams.toString())
+        .then(result => {
+            if (!result.length) {
+                return res.status(404).json({ status: 404, message: "No Clients Found", error: "No Clients Found" })
+            }
+            return res.status(200).json({ status: 200, message: "Successful", data: result })
+        }
+        )
+        .catch(e => res.status(e.status).json({ status: e.status, message: e.message, error: e.error }))
+}
+
+//POST Requests
 const createClient = (req: Request, res: AppResponse) => {
     //ideally perform all checks on req body before querying db
     //also create check email query before sending data to db, do this for all keys/columns with the unique
@@ -36,6 +54,8 @@ const createClient = (req: Request, res: AppResponse) => {
         })
 }
 
+
+//PATCH Requests
 const updateClient = (req: Request, res: AppResponse) => {
     const id = Number(req.params.id)
     const { name, job, rate, isActive, email } = req.body
@@ -54,6 +74,7 @@ const updateClient = (req: Request, res: AppResponse) => {
         })
 }
 
+//DELETE Requests
 const deleteClient = (req: Request, res: AppResponse) => {
     const id = Number(req.params.id)
     clientServices.getSingleClient(id)
@@ -69,4 +90,4 @@ const deleteClient = (req: Request, res: AppResponse) => {
         .catch(e => res.status(e.status).json({ status: e.status, message: e.message, error: e.error }))
 }
 
-export { getClients, createClient, updateClient, deleteClient }
+export { getClients, createClient, updateClient, deleteClient, searchClientByName }

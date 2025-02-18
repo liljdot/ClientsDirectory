@@ -1,6 +1,7 @@
 import { QueryResult } from "pg";
 import { query } from "../db";
 import { NewClient, Client, UpdateClientInfo } from "../types";
+import { error } from "console";
 
 const getClients = (): Promise<any[]> => {
     return query('SELECT * FROM clients')
@@ -11,6 +12,15 @@ const getClients = (): Promise<any[]> => {
 const getSingleClient = (id: number) => {
     return query(`SELECT * FROM clients WHERE id = ${id}`)
         .then(res => res.rows[0])
+        .catch(error => Promise.reject({ status: 500, message: "Internal Server Error", error }))
+}
+
+const searchClientByName = (searchParams: string): Promise<any[]> => {
+    return query(`SELECT * FROM clients
+        WHERE name ILIKE '%${searchParams}%'
+        OR email ILIKE '%${searchParams}%'
+        OR job ILIKE '%${searchParams}%'`)
+        .then(res => res.rows)
         .catch(error => Promise.reject({ status: 500, message: "Internal Server Error", error }))
 }
 
@@ -48,4 +58,4 @@ const deleteClient = (id: number) => {
         .catch(e => Promise.reject(e))
 }
 
-export default { getClients, createClient, getSingleClient, updateClient, deleteClient }
+export default { getClients, createClient, getSingleClient, updateClient, deleteClient, searchClientByName }

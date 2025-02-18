@@ -1,9 +1,11 @@
 import express from "express"
-import { createClient, deleteClient, getClients, updateClient } from '../controllers/clientController'
+import { createClient, deleteClient, getClients, searchClientByName, updateClient } from '../controllers/clientController'
 
 const clientRoutes = express()
 
 clientRoutes.get('/', getClients)
+
+clientRoutes.get('/search', searchClientByName)
 
 clientRoutes.post('/', createClient)
 
