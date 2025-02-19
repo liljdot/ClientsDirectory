@@ -1,12 +1,16 @@
 import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 const TableList: React.FC = () => {
     let clients: Client[] = []
 
     const { modalFormDispatch } = useModalFormContext()
-    const { data, error, isLoading, refetch, isError } = useQuery<{ status: number, message: string, data: Client[] }, Error>({
+    const queryClient = useQueryClient()
+
+
+
+    const { data, error, isLoading, refetch, isError, isRefetching } = useQuery<{ status: number, message: string, data: Client[] }, Error>({
         queryKey: ["clients"],
         queryFn: () => {
             return fetch("http://localhost:3000/api/clients")
@@ -14,7 +18,30 @@ const TableList: React.FC = () => {
         }
     })
 
-    if (isLoading) {
+    const { mutate: deleteClient, isPending: deleteIspending } = useMutation({
+        mutationFn: (clientId: string) => {
+            return fetch(`http://localhost:3000/api/clients/${clientId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                }
+            )
+                .then(res => res.json())
+        },
+        onSettled: () => {
+            console.log("settled")
+            queryClient.invalidateQueries({queryKey: ["clients"]})
+        },
+        // onMutate: (id) => {
+        //     queryClient.cancelQueries({queryKey: "clients"})
+        //     .then(() => queryClient.setQueryData(["clients", id], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(client => client.id != id) })))
+        // }
+    })
+
+
+    if (isLoading || isRefetching) {
         return (
             <div className="flex justify-center items-center h-full">
                 <span className="loading loading-ring loading-xl mt-20"></span>
@@ -34,7 +61,7 @@ const TableList: React.FC = () => {
         )
     }
 
-    if (data) {
+    if (data?.data) {
         clients = data.data
     }
 
@@ -64,7 +91,7 @@ const TableList: React.FC = () => {
                                     <td>{client.rate}</td>
                                     <td><button className={`btn rounded-full w-20 ${client.isActive ? "btn-success" : "btn-outline btn-primary"}`}>{client.isActive ? "Active" : "Inactive"}</button></td>
                                     <td><button className="btn-warning btn rounded-full" onClick={() => { modalFormDispatch({ type: "OPEN_MODAL", payload: { mode: "edit", data: client } }) }}>Update</button></td>
-                                    <td><button className="btn-error btn rounded-full">Delete</button></td>
+                                    <td><button className="btn-error btn rounded-full" onClick={() => { deleteClient(client.id) }}>{deleteIspending ? <span className="loading loading-spinner loading-xs"></span> : "Delete"}</button></td>
                                 </tr>
                             ))
                         ) : <></>
@@ -75,7 +102,7 @@ const TableList: React.FC = () => {
                 !clients.length && (
                     <div className="flex flex-col items-center mt-10">
                         <h3 className="text-center">You have no Clients</h3>
-                        <button className="btn btn-info mt-5 rounded" onClick={() => { modalFormDispatch({ type: "OPEN_MODAL", payload: { mode: "add", data: { name: "", id: "", email: "", job: "", isActive: false, rate: ""} } }) }}>Add a Client</button>
+                        <button className="btn btn-info mt-5 rounded" onClick={() => { modalFormDispatch({ type: "OPEN_MODAL", payload: { mode: "add", data: { name: "", id: "", email: "", job: "", isActive: false, rate: "" } } }) }}>Add a Client</button>
                     </div>
                 )
             }
