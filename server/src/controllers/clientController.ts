@@ -82,7 +82,7 @@ const deleteClient = (req: Request, res: AppResponse) => {
         .then(() => clientServices.deleteClient(id))
         .then(result => {
             if (result.command == "DELETE") {
-                return res.status(204).json({ status: 204, message: "Client Deleted Successfully" })
+                return res.status(200).json({ status: 200, message: "Client Deleted Successfully" })
             }
 
             return res.status(500).json({ status: 500, message: "Internal Server Error", error: "Internal Server Error" })

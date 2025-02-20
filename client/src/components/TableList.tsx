@@ -2,14 +2,14 @@ import { rejectJson } from "./functions"
 import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { GetClientsResponseType } from "../types/apiTypes"
+import { GetClientsResponseType, GetClientsResponseErrorType } from "../types/apiTypes"
 
 const TableList: React.FC = () => {
     let clients: Client[] = []
 
     const { modalFormDispatch } = useModalFormContext()
     const queryClient = useQueryClient()
-    const { data, error, isLoading, refetch, isError, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseType>({
+    const { data, error, isLoading, refetch, isError, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
         queryKey: ["clients"],
         queryFn: () => {
             return fetch("http://localhost:3000/api/clients")
@@ -29,9 +29,8 @@ const TableList: React.FC = () => {
             )
                 .then(res => res.json())
         },
-        onSettled: () => {
-            console.log("settled")
-            queryClient.invalidateQueries({queryKey: ["clients"]})
+        onSuccess: (data, id) => {
+            queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(client => client.id != id) }))
         },
         // onMutate: (id) => {
         //     queryClient.cancelQueries({queryKey: "clients"})
