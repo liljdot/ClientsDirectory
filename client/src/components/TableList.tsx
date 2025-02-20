@@ -1,3 +1,4 @@
+import { rejectJson } from "../functions"
 import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -14,7 +15,7 @@ const TableList: React.FC = () => {
         queryKey: ["clients"],
         queryFn: () => {
             return fetch("http://localhost:3000/api/clients")
-                .then(res => res.json())
+                .then(res => res.ok ? res.json() : rejectJson(res))
         }
     })
 
@@ -50,7 +51,6 @@ const TableList: React.FC = () => {
     }
 
     if (isError) {
-        console.log(error)
         return (
             <>
                 <div className="flex flex-col items-center">
@@ -61,7 +61,7 @@ const TableList: React.FC = () => {
         )
     }
 
-    if (data?.data) {
+    if (data) {
         clients = data.data
     }
 
