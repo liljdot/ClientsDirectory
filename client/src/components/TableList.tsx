@@ -3,16 +3,25 @@ import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { GetClientsResponseType, GetClientsResponseErrorType } from "../types/apiTypes"
+import { toast, ToastContainer } from "react-toastify"
+import Toast from "./Toast"
 
 const TableList: React.FC = () => {
     let clients: Client[] = []
+
+    const host = window.location.host
+    const serverHost = host.slice(0, host.length -4) + "3000"
+
+    const openToast = (type: "success" | "warning" | "info" | "error", data: string) => {
+        toast(<Toast type={type}/>, {data, autoClose: 3000, customProgressBar: true, closeButton: false, className: "flex flex-row justify-end"})
+    }
 
     const { modalFormDispatch } = useModalFormContext()
     const queryClient = useQueryClient()
     const { data, error, isLoading, refetch, isError, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
         queryKey: ["clients"],
         queryFn: () => {
-            return fetch("http://localhost:3000/api/clients")
+            return fetch(`http://${serverHost}/api/clients`)
                 .then(res => res.ok ? res.json() : rejectJson(res))
         }
     })
@@ -64,6 +73,10 @@ const TableList: React.FC = () => {
 
     return (
         <div className="overflow-x-auto mt-10">
+            <button onClick={() => openToast("error", "Error: Unable to delete client")}>Click</button>
+
+            < ToastContainer/>
+
             <table className="table">
                 {/* head */}
                 <thead>
