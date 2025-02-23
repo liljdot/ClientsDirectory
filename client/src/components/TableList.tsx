@@ -1,51 +1,18 @@
-import { rejectJson } from "./functions"
 import useModalFormContext from "../hooks/useModalFormContext"
 import { Client } from "../types"
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { GetClientsResponseType, GetClientsResponseErrorType } from "../types/apiTypes"
 import { toast, ToastContainer } from "react-toastify"
 import Toast from "./Toast"
+import { useGetClientsQuery } from "../hooks/api/clientsApi"
+import TableListItem from "./TableListItem"
 
 const TableList: React.FC = () => {
     let clients: Client[] = []
-
-    const host = window.location.host
-    const serverHost = host.slice(0, host.length -4) + "3000"
+    const { data, isLoading, refetch, isError, isRefetching } = useGetClientsQuery()
+    const { modalFormDispatch } = useModalFormContext()
 
     const openToast = (type: "success" | "warning" | "info" | "error", data: string) => {
-        toast(<Toast type={type}/>, {data, autoClose: 3000, customProgressBar: true, closeButton: false, className: "flex flex-row justify-end"})
+        toast(<Toast type={type} />, { data, autoClose: 3000, customProgressBar: true, closeButton: false, className: "flex flex-row justify-end" })
     }
-
-    const { modalFormDispatch } = useModalFormContext()
-    const queryClient = useQueryClient()
-    const { data, error, isLoading, refetch, isError, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
-        queryKey: ["clients"],
-        queryFn: () => {
-            return fetch(`http://${serverHost}/api/clients`)
-                .then(res => res.ok ? res.json() : rejectJson(res))
-        }
-    })
-
-    const { mutate: deleteClient, isPending: deleteIspending } = useMutation({
-        mutationFn: (clientId: string) => {
-            return fetch(`http://localhost:3000/api/clients/${clientId}`,
-                {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                }
-            )
-                .then(res => res.json())
-        },
-        onSuccess: (data, id) => {
-            queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(client => client.id != id) }))
-        },
-        // onMutate: (id) => {
-        //     queryClient.cancelQueries({queryKey: "clients"})
-        //     .then(() => queryClient.setQueryData(["clients", id], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(client => client.id != id) })))
-        // }
-    })
 
 
     if (isLoading || isRefetching) {
@@ -73,9 +40,9 @@ const TableList: React.FC = () => {
 
     return (
         <div className="overflow-x-auto mt-10">
-            <button onClick={() => openToast("error", "Error: Unable to delete client")}>Click</button>
+            <button onClick={() => openToast("success", "Error: Unable to delete client")}>Click</button>
 
-            < ToastContainer/>
+            < ToastContainer />
 
             <table className="table">
                 {/* head */}
@@ -93,16 +60,7 @@ const TableList: React.FC = () => {
                     {
                         clients.length ? (
                             clients.map(client => (
-                                <tr key={client.id}>
-                                    <th>{client.id}</th>
-                                    <td>{client.name}</td>
-                                    <td>{client.email}</td>
-                                    <td>{client.job}</td>
-                                    <td>{client.rate}</td>
-                                    <td><button className={`btn rounded-full w-20 ${client.isActive ? "btn-success" : "btn-outline btn-primary"}`}>{client.isActive ? "Active" : "Inactive"}</button></td>
-                                    <td><button className="btn-warning btn rounded-full" onClick={() => { modalFormDispatch({ type: "OPEN_MODAL", payload: { mode: "edit", data: client } }) }}>Update</button></td>
-                                    <td><button className="btn-error btn rounded-full" onClick={() => { deleteClient(client.id) }}>{deleteIspending ? <span className="loading loading-spinner loading-xs"></span> : "Delete"}</button></td>
-                                </tr>
+                                <TableListItem key={client.id} client={client} modalFormDispatch={modalFormDispatch} openToast={openToast} />
                             ))
                         ) : <></>
                     }
