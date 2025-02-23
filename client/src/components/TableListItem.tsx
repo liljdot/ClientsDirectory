@@ -11,12 +11,15 @@ interface Props {
 const TableListItem: React.FC<Props> = ({ client }) => {
     const { mutateAsync: deleteClient, isPending: deleteIspending } = useDeleteClientMutation()
     const queryClient = useQueryClient()
-    const {openToast} = useToastContext()
-    const {modalFormDispatch} = useModalFormContext()
+    const { openToast } = useToastContext()
+    const { modalFormDispatch } = useModalFormContext()
 
     const handleDelete: EventHandler<React.MouseEvent> = () => {
         deleteClient(client.id)
-            .then(() => openToast("success", "Client deleted successfully"))
+            .then(() => {
+                queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(deletedClient => deletedClient.id != client.id) }))
+                openToast("success", "Client deleted successfully")
+            })
             .catch(e => openToast("error", e.message))
     }
     return (
