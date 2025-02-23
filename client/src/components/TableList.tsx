@@ -1,18 +1,16 @@
-import useModalFormContext from "../hooks/useModalFormContext"
+import useModalFormContext from "../hooks/context hooks/useModalFormContext"
 import { Client } from "../types"
-import { toast, ToastContainer } from "react-toastify"
-import Toast from "./Toast"
+import { ToastContainer } from "react-toastify"
 import { useGetClientsQuery } from "../hooks/api/clientsApi"
 import TableListItem from "./TableListItem"
+import useToastContext from "../hooks/context hooks/useToastContext"
 
 const TableList: React.FC = () => {
     let clients: Client[] = []
     const { data, isLoading, refetch, isError, isRefetching } = useGetClientsQuery()
     const { modalFormDispatch } = useModalFormContext()
 
-    const openToast = (type: "success" | "warning" | "info" | "error", data: string) => {
-        toast(<Toast type={type} />, { data, autoClose: 3000, customProgressBar: true, closeButton: false, className: "flex flex-row justify-end" })
-    }
+    const { openToast } = useToastContext()
 
 
     if (isLoading || isRefetching) {
@@ -42,8 +40,6 @@ const TableList: React.FC = () => {
         <div className="overflow-x-auto mt-10">
             <button onClick={() => openToast("success", "Error: Unable to delete client")}>Click</button>
 
-            < ToastContainer />
-
             <table className="table">
                 {/* head */}
                 <thead>
@@ -60,7 +56,7 @@ const TableList: React.FC = () => {
                     {
                         clients.length ? (
                             clients.map(client => (
-                                <TableListItem key={client.id} client={client} modalFormDispatch={modalFormDispatch} openToast={openToast} />
+                                <TableListItem key={client.id} client={client} />
                             ))
                         ) : <></>
                     }

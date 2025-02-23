@@ -1,18 +1,19 @@
 import { EventHandler } from "react"
-import { ModalFormReducerActions } from "../reducers/modalFormReducer"
 import { Client } from "../types"
 import { useDeleteClientMutation, useQueryClient } from "../hooks/api/clientsApi"
+import useToastContext from "../hooks/context hooks/useToastContext"
+import useModalFormContext from "../hooks/context hooks/useModalFormContext"
 
 interface Props {
     client: Client
-    modalFormDispatch: React.Dispatch<ModalFormReducerActions>
-    openToast: (type: "success" | "warning" | "info" | "error", data: string) => void
 }
 
-    const TableListItem: React.FC<Props> = ({ client, modalFormDispatch, openToast }) => {
+const TableListItem: React.FC<Props> = ({ client }) => {
     const { mutateAsync: deleteClient, isPending: deleteIspending } = useDeleteClientMutation()
     const queryClient = useQueryClient()
-    
+    const {openToast} = useToastContext()
+    const {modalFormDispatch} = useModalFormContext()
+
     const handleDelete: EventHandler<React.MouseEvent> = () => {
         deleteClient(client.id)
             .then(() => openToast("success", "Client deleted successfully"))

@@ -3,13 +3,16 @@ import './index.css'
 import App from './App.tsx'
 import ModalFormContextProvider from './contexts/modalFormContext.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ToastContextProvider } from './contexts/toastContext.tsx'
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={queryClient}>
-    <ModalFormContextProvider>
-      <App />
-    </ModalFormContextProvider>
+    <ToastContextProvider>
+      <ModalFormContextProvider>
+        <App />
+      </ModalFormContextProvider>
+    </ToastContextProvider>
   </ QueryClientProvider>,
 )
