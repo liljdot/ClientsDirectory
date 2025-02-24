@@ -2,7 +2,7 @@ import { ChangeEvent, EventHandler, FormEventHandler, useState } from "react"
 import useModalFormContext from "../hooks/context hooks/useModalFormContext"
 import { useAddClientMutation } from "../hooks/api/clientsApi"
 import useToastContext from "../hooks/context hooks/useToastContext"
-import { QueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import { GetClientsResponseType } from "../types/apiTypes"
 
 interface Props {
@@ -14,7 +14,7 @@ const ModalForm: React.FC<Props> = () => {
     const [form, setForm] = useState({ ...modalFormState.data })
     const { mutateAsync: addNewClient, isPending: addClientIsPending } = useAddClientMutation()
     const { openToast } = useToastContext()
-    const queryClient = new QueryClient()
+    const queryClient = useQueryClient()
 
     const handleFormChange: EventHandler<ChangeEvent<HTMLInputElement>> = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -33,7 +33,7 @@ const ModalForm: React.FC<Props> = () => {
         console.log(form)
         if (modalFormState.mode == "add") {
             addNewClient({ name, email, rate: Number(rate), isActive, job })
-                .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => console.log(oldData)))
+                .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({...oldData, data: [...oldData.data, res.data]})))
                 .then(() => openToast("success", "Client Added Successfully"))
                 .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
                 .catch(e => openToast("error", e.message))

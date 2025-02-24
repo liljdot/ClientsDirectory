@@ -28,7 +28,7 @@ const useAddClientMutation = () => {
                 },
                 body: JSON.stringify(clientObj)
             })
-                .then(res => res.ok ? res.json : rejectJson(res))
+                .then(res => res.ok ? res.json() : rejectJson(res))
         }
     })
 
