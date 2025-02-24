@@ -1,5 +1,9 @@
 import { ChangeEvent, EventHandler, FormEventHandler, useState } from "react"
 import useModalFormContext from "../hooks/context hooks/useModalFormContext"
+import { useAddClientMutation } from "../hooks/api/clientsApi"
+import useToastContext from "../hooks/context hooks/useToastContext"
+import { QueryClient } from "@tanstack/react-query"
+import { GetClientsResponseType } from "../types/apiTypes"
 
 interface Props {
 
@@ -8,6 +12,9 @@ interface Props {
 const ModalForm: React.FC<Props> = () => {
     const { modalFormState, modalFormDispatch } = useModalFormContext()
     const [form, setForm] = useState({ ...modalFormState.data })
+    const { mutateAsync: addNewClient, isPending: addClientIsPending } = useAddClientMutation()
+    const { openToast } = useToastContext()
+    const queryClient = new QueryClient()
 
     const handleFormChange: EventHandler<ChangeEvent<HTMLInputElement>> = (e) => {
         setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -19,8 +26,19 @@ const ModalForm: React.FC<Props> = () => {
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
         e.preventDefault()
+        const { name, email, isActive = false, rate, job } = form
+        if (!name || !email) {
+            return
+        }
         console.log(form)
-        modalFormDispatch({ type: "CLOSE_MODAL", payload: null })
+        if (modalFormState.mode == "add") {
+            addNewClient({ name, email, rate: Number(rate), isActive, job })
+                .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => console.log(oldData)))
+                .then(() => openToast("success", "Client Added Successfully"))
+                .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
+                .catch(e => openToast("error", e.message))
+        }
+
 
     }
 
@@ -34,11 +52,11 @@ const ModalForm: React.FC<Props> = () => {
                     <form method="dialog" onSubmit={handleSubmit}>
                         {/* if there is a button in form, it will close the modal */}
                         <label className="input input-borderd w-full my-4 flex items-center gap-2 rounded ">
-                            <input name="name" type="text" className="grow" placeholder="Name" value={form.name} onChange={handleFormChange} />
+                            <input name="name" type="text" className="grow" placeholder="Name" value={form.name} onChange={handleFormChange} required />
                         </label>
 
                         <label className="input input-borderd w-full my-4 flex items-center gap-2 rounded">
-                            <input name="email" type="text" className="grow" placeholder="Email" value={form.email} onChange={handleFormChange} />
+                            <input name="email" type="text" className="grow" placeholder="Email" value={form.email} onChange={handleFormChange} required />
                         </label>
 
                         <label className="input input-borderd w-full my-4 flex items-center gap-2 rounded">
@@ -56,9 +74,10 @@ const ModalForm: React.FC<Props> = () => {
                             </select>
                         </div>
 
-                        <button type="submit" className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => { modalFormDispatch({ type: "CLOSE_MODAL", payload: null }) }}>✕</button>
-                        {modalFormState.mode == "add" ? <button className="btn btn-info rounded">Add</button>
+                        {modalFormState.mode == "add" ? <button type="submit" className="btn btn-info rounded">{addClientIsPending ? <span className="loading loading-spinner loading-xs"></span> : "Add"}</button>
                             : <button type="submit" className="btn btn-warning rounded">Save Changes</button>}
+
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => { modalFormDispatch({ type: "CLOSE_MODAL", payload: null }) }}>✕</button>
                     </form>
                 </div>
             </dialog>

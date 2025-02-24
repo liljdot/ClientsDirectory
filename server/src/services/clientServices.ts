@@ -30,7 +30,7 @@ const createClient = ({ name, job, rate, isActive, email }: NewClient): Promise<
         email,
         job,
         rate,
-        isActive)
+        "isActive")
         VALUES (
         '${name}',
         '${email}',

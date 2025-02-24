@@ -13,3 +13,17 @@ export interface GetClientsResponseErrorType {
     error: any
     data?: Client[]
 }
+
+export interface AddClientsResponseType {
+    status: number
+    message: string
+    error?: any
+    data: Client
+}
+
+export interface AddClientsResponseErrorType {
+    status: number
+    message: string
+    error?: any
+    data?: Client
+}
