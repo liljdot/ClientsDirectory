@@ -1,6 +1,6 @@
 import { ChangeEvent, EventHandler, FormEventHandler, useState } from "react"
 import useModalFormContext from "../hooks/context hooks/useModalFormContext"
-import { useAddClientMutation } from "../hooks/api/clientsApi"
+import { useAddClientMutation, useUpdateClientMutation } from "../hooks/api/clientsApi"
 import useToastContext from "../hooks/context hooks/useToastContext"
 import { useQueryClient } from "@tanstack/react-query"
 import { GetClientsResponseType } from "../types/apiTypes"
@@ -13,6 +13,7 @@ const ModalForm: React.FC<Props> = () => {
     const { modalFormState, modalFormDispatch } = useModalFormContext()
     const [form, setForm] = useState({ ...modalFormState.data })
     const { mutateAsync: addNewClient, isPending: addClientIsPending } = useAddClientMutation()
+    const { mutateAsync: updateClient, isPending: updateClientIsPending } = useUpdateClientMutation()
     const { openToast } = useToastContext()
     const queryClient = useQueryClient()
 
@@ -26,18 +27,31 @@ const ModalForm: React.FC<Props> = () => {
 
     const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
         e.preventDefault()
-        const { name, email, isActive = false, rate, job } = form
+
+        const { id, name, email, isActive = false, rate, job } = form
+
         if (!name || !email) {
             return
         }
+
         console.log(form)
         if (modalFormState.mode == "add") {
-            addNewClient({ name, email, rate: Number(rate), isActive, job })
-                .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({...oldData, data: [...oldData.data, res.data]})))
+            return addNewClient({ name, email, rate: Number(rate), isActive, job })
+                .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({ ...oldData, data: [...oldData.data, res.data] })))
                 .then(() => openToast("success", "Client Added Successfully"))
                 .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
                 .catch(e => openToast("error", e.message))
         }
+
+        if (!id) {
+            return
+        }
+
+        updateClient({ id, name, email, rate: Number(rate), isActive, job })
+            .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({ ...oldData, data: [...oldData.data.map(client => client.id == id ? res.data : client)] })))
+            .then(() => openToast("warning", "Client Updated Successfully"))
+            .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
+            .catch(e => openToast("error", e.message))
 
 
     }
@@ -75,7 +89,7 @@ const ModalForm: React.FC<Props> = () => {
                         </div>
 
                         {modalFormState.mode == "add" ? <button type="submit" className="btn btn-info rounded">{addClientIsPending ? <span className="loading loading-spinner loading-xs"></span> : "Add"}</button>
-                            : <button type="submit" className="btn btn-warning rounded">Save Changes</button>}
+                            : <button type="submit" className="btn btn-warning rounded">{updateClientIsPending ? <span className="loading loading-spinner loading-xs"></span> : "Save Changes"}</button>}
 
                         <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" onClick={() => { modalFormDispatch({ type: "CLOSE_MODAL", payload: null }) }}>✕</button>
                     </form>

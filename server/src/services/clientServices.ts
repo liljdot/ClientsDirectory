@@ -44,7 +44,7 @@ const createClient = ({ name, job, rate, isActive, email }: NewClient): Promise<
 
 const updateClient = ({ id, name, job, rate, isActive, email }: UpdateClientInfo): Promise<QueryResult<any>> => {
     return query(`UPDATE clients
-        SET name = '${name}', job = '${job}', rate = ${rate}, isActive = ${isActive}, email = '${email}'
+        SET name = '${name}', job = '${job}', rate = ${rate}, "isActive" = ${isActive}, email = '${email}'
         WHERE id = ${id}
         RETURNING *`)
         .then(res => res)

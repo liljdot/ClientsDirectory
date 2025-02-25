@@ -27,3 +27,17 @@ export interface AddClientsResponseErrorType {
     error?: any
     data?: Client
 }
+
+export interface UpdateClientsResponseType {
+    status: number
+    message: string
+    error?: any
+    data: Client
+}
+
+export interface UpdateClientsResponseErrorType {
+    status: number
+    message: string
+    error?: any
+    data?: Client
+}

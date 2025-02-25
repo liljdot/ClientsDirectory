@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { AddClientsResponseErrorType, AddClientsResponseType, GetClientsResponseErrorType, GetClientsResponseType } from "../../types/apiTypes"
+import { AddClientsResponseErrorType, AddClientsResponseType, GetClientsResponseErrorType, GetClientsResponseType, UpdateClientsResponseErrorType, UpdateClientsResponseType } from "../../types/apiTypes"
 import { rejectJson } from "../../components/functions"
-import { newClient } from "../../types"
+import { Client, newClient } from "../../types"
 
 const host = window.location.host
 const serverHost = host.slice(0, host.length - 4) + "3000"
@@ -32,7 +32,24 @@ const useAddClientMutation = () => {
         }
     })
 
-    return {mutate, mutateAsync, isPending, isError, isSuccess}
+    return { mutate, mutateAsync, isPending, isError, isSuccess }
+}
+
+const useUpdateClientMutation = () => {
+    const { mutate, mutateAsync, isPending, isError, isSuccess } = useMutation<UpdateClientsResponseType, UpdateClientsResponseErrorType, Client>({
+        mutationFn: (clientObj: Client) => {
+            return fetch(`http://${serverHost}/api/clients/${clientObj.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(clientObj)
+            })
+                .then(res => res.ok ? res.json() : rejectJson(res))
+        }
+    })
+
+    return { mutate, mutateAsync, isPending, isError, isSuccess }
 }
 
 const useDeleteClientMutation = () => {
@@ -48,13 +65,9 @@ const useDeleteClientMutation = () => {
             )
                 .then(res => res.ok ? res.json() : rejectJson(res))
         },
-        onSuccess: (...[, id]) => {
-            console.log("success")
-            // queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(client => client.id != id) }))
-        }
     })
 
     return { mutate, isPending, isError, isSuccess, mutateAsync, variables }
 }
 
-export { useGetClientsQuery, useDeleteClientMutation, useQueryClient, useAddClientMutation }
+export { useGetClientsQuery, useDeleteClientMutation, useQueryClient, useAddClientMutation, useUpdateClientMutation }
