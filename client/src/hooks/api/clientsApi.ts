@@ -36,7 +36,7 @@ const useAddClientMutation = () => {
 }
 
 const useDeleteClientMutation = () => {
-    const { mutate, isPending, isError, isSuccess, mutateAsync } = useMutation({
+    const { mutate, isPending, isError, isSuccess, mutateAsync, variables } = useMutation({
         mutationFn: (clientId: string) => {
             return fetch(`http://${serverHost}/api/clients/${clientId}`,
                 {
@@ -54,7 +54,7 @@ const useDeleteClientMutation = () => {
         }
     })
 
-    return { mutate, isPending, isError, isSuccess, mutateAsync }
+    return { mutate, isPending, isError, isSuccess, mutateAsync, variables }
 }
 
 export { useGetClientsQuery, useDeleteClientMutation, useQueryClient, useAddClientMutation }

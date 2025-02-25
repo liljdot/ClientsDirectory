@@ -1,27 +1,16 @@
-import { EventHandler } from "react"
 import { Client } from "../types"
-import { useDeleteClientMutation, useQueryClient } from "../hooks/api/clientsApi"
-import useToastContext from "../hooks/context hooks/useToastContext"
 import useModalFormContext from "../hooks/context hooks/useModalFormContext"
 
 interface Props {
     client: Client
+    deleteItem: (id: string) => void
+    deleteIspending: boolean
+    variable: string | undefined
 }
 
-const TableListItem: React.FC<Props> = ({ client }) => {
-    const { mutateAsync: deleteClient, isPending: deleteIspending } = useDeleteClientMutation()
-    const queryClient = useQueryClient()
-    const { openToast } = useToastContext()
+const TableListItem: React.FC<Props> = ({ client, deleteItem, deleteIspending, variable }) => {
     const { modalFormDispatch } = useModalFormContext()
 
-    const handleDelete: EventHandler<React.MouseEvent> = () => {
-        deleteClient(client.id)
-            .then(() => {
-                queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(deletedClient => deletedClient.id != client.id) }))
-                openToast("success", "Client deleted successfully")
-            })
-            .catch(e => openToast("error", e.message))
-    }
     return (
         <>
             <tr>
@@ -32,7 +21,7 @@ const TableListItem: React.FC<Props> = ({ client }) => {
                 <td>{client.rate}</td>
                 <td><button className={`btn rounded-full w-20 ${client.isActive ? "btn-success" : "btn-outline btn-primary"}`}>{client.isActive ? "Active" : "Inactive"}</button></td>
                 <td><button className="btn-warning btn rounded" onClick={() => { modalFormDispatch({ type: "OPEN_MODAL", payload: { mode: "edit", data: client } }) }}>Update</button></td>
-                <td><button className="btn-error btn rounded" onClick={handleDelete}>{deleteIspending ? <span className="loading loading-spinner loading-xs"></span> : "Delete"}</button></td>
+                <td><button className="btn-error btn rounded" onClick={() => deleteItem(client.id)}>{deleteIspending && variable == client.id ? <span className="loading loading-spinner loading-xs"></span> : "Delete"}</button></td>
             </tr>
         </>
     )

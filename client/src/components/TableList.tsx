@@ -1,7 +1,6 @@
 import useModalFormContext from "../hooks/context hooks/useModalFormContext"
 import { Client } from "../types"
-import { ToastContainer } from "react-toastify"
-import { useGetClientsQuery } from "../hooks/api/clientsApi"
+import { useDeleteClientMutation, useGetClientsQuery, useQueryClient } from "../hooks/api/clientsApi"
 import TableListItem from "./TableListItem"
 import useToastContext from "../hooks/context hooks/useToastContext"
 
@@ -9,8 +8,18 @@ const TableList: React.FC = () => {
     let clients: Client[] = []
     const { data, isLoading, refetch, isError, isRefetching } = useGetClientsQuery()
     const { modalFormDispatch } = useModalFormContext()
-
+    const { mutateAsync: deleteClient, isPending: deleteIspending, variables: variable } = useDeleteClientMutation()
     const { openToast } = useToastContext()
+    const queryClient = useQueryClient()
+
+    const handleDelete = (id: string) => {
+        deleteClient(id)
+            .then(() => {
+                queryClient.setQueryData(["clients"], (oldData: any) => ({ ...oldData, data: [...oldData.data].filter(deletedClient => deletedClient.id != id) }))
+                openToast("success", "Client deleted successfully")
+            })
+            .catch(e => openToast("error", e.message))
+    }
 
 
     if (isLoading || isRefetching) {
@@ -56,7 +65,7 @@ const TableList: React.FC = () => {
                     {
                         clients.length ? (
                             clients.map(client => (
-                                <TableListItem key={client.id} client={client} />
+                                <TableListItem key={client.id} client={client} deleteItem={handleDelete} deleteIspending={deleteIspending} variable={variable} />
                             ))
                         ) : <></>
                     }
