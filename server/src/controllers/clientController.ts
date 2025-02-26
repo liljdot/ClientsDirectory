@@ -61,7 +61,7 @@ const updateClient = (req: Request, res: AppResponse) => {
     const { name, job, rate, isActive, email } = req.body
     clientServices.getSingleClient(id)
         .then((client: Client) => !client ? Promise.reject({ status: 404, message: "Client does not exist", error: "Client does not exist" }) : client)
-        .then(client => clientServices.updateClient({ id, name: name || client.name, job: job || client.job, rate: rate || client.rate, isActive: isActive || client.isActive, email: email || client.email }))
+        .then(client => clientServices.updateClient({ id, name: name || client.name, job: job || client.job, rate: rate || client.rate, isActive, email: email || client.email }))
         .then(result => {
             if (result.command == "UPDATE") {
                 return res.status(200).json({ status: 500, message: "Client Updated Successfully", data: result.rows[0] })

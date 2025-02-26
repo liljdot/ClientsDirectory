@@ -18,6 +18,23 @@ const useGetClientsQuery = () => {
     return { data, isLoading, isError, error, refetch, isRefetching }
 }
 
+const useSearchClientsQuery = (q: string) => {
+    // const queryClient = useQueryClient()
+    const { data, isLoading, isError, error, refetch, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
+        queryKey: ["search"],
+        queryFn: () => {
+            return fetch(`http://${serverHost}/api/clients/search/?q=${q}`)
+                .then(res => res.ok ? res.json() : rejectJson(res))
+        },
+        enabled: false,
+        // behavior: {
+        //     onFetch: (query) => query.client.cancelQueries({queryKey: ["search"]})
+        // }
+    })
+
+    return { data, isLoading, isError, error, refetch, isRefetching }
+}
+
 const useAddClientMutation = () => {
     const { mutate, mutateAsync, isPending, isError, isSuccess } = useMutation<AddClientsResponseType, AddClientsResponseErrorType, newClient>({
         mutationFn: (clientObj: newClient) => {
@@ -70,4 +87,4 @@ const useDeleteClientMutation = () => {
     return { mutate, isPending, isError, isSuccess, mutateAsync, variables }
 }
 
-export { useGetClientsQuery, useDeleteClientMutation, useQueryClient, useAddClientMutation, useUpdateClientMutation }
+export { useGetClientsQuery, useDeleteClientMutation, useQueryClient, useAddClientMutation, useUpdateClientMutation, useSearchClientsQuery }

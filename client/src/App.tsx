@@ -6,11 +6,11 @@ import useModalFormContext from './hooks/context hooks/useModalFormContext';
 import { ToastContainer } from 'react-toastify';
 
 function App() {
-  const {modalFormState} = useModalFormContext()
+  const { modalFormState } = useModalFormContext()
 
   return (
     <>
-      {modalFormState.isOpen &&<ModalForm />}
+      {modalFormState.isOpen && <ModalForm />}
       <Navbar />
       <TableList />
       <ToastContainer />

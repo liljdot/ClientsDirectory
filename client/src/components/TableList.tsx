@@ -47,8 +47,6 @@ const TableList: React.FC = () => {
 
     return (
         <div className="overflow-x-auto mt-10">
-            <button onClick={() => openToast("success", "Error: Unable to delete client")}>Click</button>
-
             <table className="table">
                 {/* head */}
                 <thead>
@@ -61,6 +59,7 @@ const TableList: React.FC = () => {
                         <td>Status</td>
                     </tr>
                 </thead>
+                
                 <tbody className="hover:bg-base-300">
                     {
                         clients.length ? (

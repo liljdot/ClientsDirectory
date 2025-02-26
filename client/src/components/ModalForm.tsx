@@ -28,7 +28,7 @@ const ModalForm: React.FC<Props> = () => {
     const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
         e.preventDefault()
 
-        const { id, name, email, isActive = false, rate, job } = form
+        const { id, name, email, isActive, rate, job } = form
 
         if (!name || !email) {
             return
@@ -36,7 +36,7 @@ const ModalForm: React.FC<Props> = () => {
 
         console.log(form)
         if (modalFormState.mode == "add") {
-            return addNewClient({ name, email, rate: Number(rate), isActive, job })
+            return addNewClient({ name, email, rate: Number(rate), isActive: isActive || false, job })
                 .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({ ...oldData, data: [...oldData.data, res.data] })))
                 .then(() => openToast("success", "Client Added Successfully"))
                 .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
@@ -47,7 +47,7 @@ const ModalForm: React.FC<Props> = () => {
             return
         }
 
-        updateClient({ id, name, email, rate: Number(rate), isActive, job })
+        updateClient({ id, name, email, rate: Number(rate), isActive: isActive || false, job })
             .then(res => queryClient.setQueryData(["clients"], (oldData: GetClientsResponseType) => ({ ...oldData, data: [...oldData.data.map(client => client.id == id ? res.data : client)] })))
             .then(() => openToast("warning", "Client Updated Successfully"))
             .then(() => modalFormDispatch({ type: "CLOSE_MODAL", payload: null }))
