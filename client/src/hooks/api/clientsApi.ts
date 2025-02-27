@@ -3,9 +3,9 @@ import { AddClientsResponseErrorType, AddClientsResponseType, GetClientsResponse
 import { rejectJson } from "../../components/functions"
 import { Client, newClient } from "../../types"
 
-const host = window.location.host
-const serverHost = host.slice(0, host.length - 4) + "3000"
-const baseUrl = `http://${serverHost}/api/clients`
+// const host = window.location.host
+// const serverHost = host.slice(0, host.length - 4) + "3000"
+const baseUrl = `https://clientsdirectoryserver.onrender.com/api/clients`
 
 const useGetClientsQuery = () => {
     const { data, isLoading, isError, error, refetch, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
