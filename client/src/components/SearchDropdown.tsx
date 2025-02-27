@@ -28,6 +28,7 @@ const SearchDropdown: React.FC<Props> = () => {
         if (!searchInput.length) {
             return
         }
+
         refetch()
     }, [searchInput])
 

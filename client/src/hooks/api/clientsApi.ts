@@ -5,12 +5,13 @@ import { Client, newClient } from "../../types"
 
 const host = window.location.host
 const serverHost = host.slice(0, host.length - 4) + "3000"
+const baseUrl = `http://${serverHost}/api/clients`
 
 const useGetClientsQuery = () => {
     const { data, isLoading, isError, error, refetch, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
         queryKey: ["clients"],
         queryFn: () => {
-            return fetch(`http://${serverHost}/api/clients`)
+            return fetch(baseUrl)
                 .then(res => res.ok ? res.json() : rejectJson(res))
         }
     })
@@ -23,13 +24,10 @@ const useSearchClientsQuery = (q: string) => {
     const { data, isLoading, isError, error, refetch, isRefetching } = useQuery<GetClientsResponseType, GetClientsResponseErrorType>({
         queryKey: ["search"],
         queryFn: () => {
-            return fetch(`http://${serverHost}/api/clients/search/?q=${q}`)
+            return fetch(`${baseUrl}/search/?q=${q}`)
                 .then(res => res.ok ? res.json() : rejectJson(res))
         },
-        enabled: false,
-        // behavior: {
-        //     onFetch: (query) => query.client.cancelQueries({queryKey: ["search"]})
-        // }
+        enabled: false
     })
 
     return { data, isLoading, isError, error, refetch, isRefetching }
@@ -38,7 +36,7 @@ const useSearchClientsQuery = (q: string) => {
 const useAddClientMutation = () => {
     const { mutate, mutateAsync, isPending, isError, isSuccess } = useMutation<AddClientsResponseType, AddClientsResponseErrorType, newClient>({
         mutationFn: (clientObj: newClient) => {
-            return fetch(`http://${serverHost}/api/clients`, {
+            return fetch(baseUrl, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -55,7 +53,7 @@ const useAddClientMutation = () => {
 const useUpdateClientMutation = () => {
     const { mutate, mutateAsync, isPending, isError, isSuccess } = useMutation<UpdateClientsResponseType, UpdateClientsResponseErrorType, Client>({
         mutationFn: (clientObj: Client) => {
-            return fetch(`http://${serverHost}/api/clients/${clientObj.id}`, {
+            return fetch(`${baseUrl}/${clientObj.id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -72,7 +70,7 @@ const useUpdateClientMutation = () => {
 const useDeleteClientMutation = () => {
     const { mutate, isPending, isError, isSuccess, mutateAsync, variables } = useMutation({
         mutationFn: (clientId: string) => {
-            return fetch(`http://${serverHost}/api/clients/${clientId}`,
+            return fetch(`${baseUrl}/${clientId}`,
                 {
                     method: "DELETE",
                     headers: {
