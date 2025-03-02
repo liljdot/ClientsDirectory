@@ -1,7 +1,7 @@
 import { QueryResult } from "pg";
 import { query } from "../db";
-import { NewClient, Client, UpdateClientInfo } from "../types";
-import { error } from "console";
+import { NewClient, UpdateClientInfo } from "../types";
+
 
 const getClients = (): Promise<any[]> => {
     return query('SELECT * FROM clients')
